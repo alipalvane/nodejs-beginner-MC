@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const jwt = require("jsonwebtoken")
 const User = require("../models/users");
 
 const getUsers = async (req, res, next) => {
@@ -15,7 +16,9 @@ const signup = async (req, res, next) => {
 
   await newUser.save();
 
-  res.status(201).json({ user: newUser });
+  const token = jwt.sign({email: newUser.email}, 'secret_key')
+
+  res.status(201).json({ user: newUser, token });
 };
 
 const login = async (req, res, next) => {
@@ -33,7 +36,9 @@ const login = async (req, res, next) => {
     res.json({message: "Invalid password"})
   }
 
-  res.json({ message: "logged in successfully" });
+  const token = jwt.sign({email:validUser.email}, 'secret_key')
+
+  res.json({token});
 };
 
 exports.getUsers = getUsers;

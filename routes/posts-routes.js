@@ -1,5 +1,6 @@
 const express = require("express");
 const { check } = require("express-validator");
+const auth = require('../middleware/auth')
 const {
   getPostById,
   getPosts,
@@ -12,6 +13,8 @@ const router = express.Router();
 router.get("/", getPosts);
 
 router.get("/:id", getPostById);
+
+router.use(auth)
 
 router.post(
   "/",
