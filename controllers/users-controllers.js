@@ -1,33 +1,36 @@
-const { v4: uuid } = require("uuid");
-const users = [
-  {
-    id: "u1",
-    email: "test@test.com",
-    password: "123456",
-  },
-];
+const bcrypt = require('bcryptjs')
+const User = require("../models/users");
 
-const getUsers = (req, res, next) => {
+const getUsers = async (req, res, next) => {
+  const users = await User.find()
   res.json({ users });
 };
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const newUser = { id: uuid(), email, password };
+  const hashedPassword = await bcrypt.hash(password, 12)
 
-  users.push(newUser);
+  const newUser = new User({email, password: hashedPassword});
+
+  await newUser.save();
 
   res.status(201).json({ user: newUser });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const validUser = users.find((user) => user.email === email);
+  const validUser = await User.findOne({email: email})
 
-  if (!validUser || validUser.password !== password) {
-    res.json({ message: "user not valid" });
+  if(!validUser){
+    res.json({message: "Invalid user"})
+  }
+
+  const validPassword = await bcrypt.compare(password, validUser.password)
+
+  if(!validPassword){
+    res.json({message: "Invalid password"})
   }
 
   res.json({ message: "logged in successfully" });

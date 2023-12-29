@@ -1,9 +1,9 @@
-const { v4: uuid } = require("uuid");
 const { validationResult } = require("express-validator");
 const Post = require("../models/posts");
 
-const getPosts = (req, res, next) => {
-  //res.json(posts);
+const getPosts = async (req, res, next) => {
+  const posts = await Post.find()
+  res.json({posts})
 };
 
 const getPostById = async (req, res, next) => {
